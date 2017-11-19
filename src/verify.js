@@ -35,7 +35,6 @@ function verify (id, _recordState = true) {
   const permutation = fromId(id)
 
   // Initialize state
-  const stateArray = _recordState && []
   const state = {}
   for (const side of SIDES) {
     state[side] = {
@@ -45,10 +44,9 @@ function verify (id, _recordState = true) {
       d5: UNKNOWN
     }
   }
+  const stateArray = _recordState && [{ state }]
 
   while (true) {
-    _recordState && stateArray.push(deepClone(state))
-
     const nextPassed = firstRulePassed(permutation, state)
     if (nextPassed) {
       const { triplet, rule } = nextPassed
@@ -58,6 +56,11 @@ function verify (id, _recordState = true) {
       // New information found
       if (sideState[d] === UNKNOWN) {
         sideState[d] = truth
+
+        _recordState && stateArray.push({
+          state: deepClone(state),
+          rule: nextPassed
+        })
 
       // Contradiction found
       } else {
