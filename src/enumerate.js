@@ -60,13 +60,22 @@ function getEquivalents (id) {
     permutationArray[triplet] = id % TYPES.length
   }
 
-  return SYMMETRIES.map(symmetry => {
+  const equivalents = SYMMETRIES.map(symmetry => {
     let id = 0
     for (let triplet = 0, exp = 1; triplet < 6; ++triplet, exp *= TYPES.length) {
       id += permutationArray[symmetry[triplet]] * exp
     }
     return id
-  }).sort((a, b) => a > b)
+  })
+
+  return equivalents
+    .sort((a, b) => a > b ? 1 : -1)
+    .reduce((acc, curr) => {
+      if (acc.indexOf(curr) === -1) {
+        acc.push(curr)
+      }
+      return acc
+    }, [])
 }
 
 module.exports = {
