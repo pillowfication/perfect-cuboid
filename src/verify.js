@@ -44,7 +44,7 @@ function verify (id, _recordState = true) {
       d5: UNKNOWN
     }
   }
-  const stateArray = _recordState && [{ state }]
+  const stateArray = _recordState && [{ state: deepClone(state) }]
 
   while (true) {
     const nextPassed = firstRulePassed(permutation, state)
