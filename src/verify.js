@@ -1,29 +1,33 @@
-const { SIDES, TRIPLETS, fromId } = require('./enumerate')
+const { SIDES, TRIPLES, fromId } = require('./enumerate')
+const { UNKNOWN } = require('./Statement')
 const proofTable = require('./proof-table')
-
-const UNKNOWN = 0
 
 function deepClone (object) {
   return JSON.parse(JSON.stringify(object))
 }
 
-function rulePasses (rule, triplet, state) {
-  for (const { side, truth, d } of rule._if) {
-    if (state[triplet[side]][d] !== truth) {
+function rulePasses (triple, rule, knowledge) {
+  for (const { side, truth, divisibility } of rule.if) {
+    if (knowledge[triple[side]][divisibility] !== truth) {
       return false
     }
   }
   return true
 }
 
-function firstRulePassed (permutation, state) {
-  for (const triplet of TRIPLETS) {
-    for (const rule of proofTable[permutation[triplet]]) {
-      if (rulePasses(rule, triplet, state)) {
+function firstRulePassed (permutation, knowledge) {
+  for (const triple of TRIPLES) {
+    for (const rule of proofTable[permutation[triple]]) {
+      if (rulePasses(triple, rule, knowledge)) {
         // Check if new information is available
-        const { side, truth, d } = rule._then
-        if (state[triplet[side]][d] !== truth) {
-          return { triplet, rule }
+        const { side, truth, divisibility } = rule.then
+        if (knowledge[triple[side]][divisibility] !== truth) {
+          return {
+            triple,
+            side,
+            truth,
+            divisibility
+          }
         }
       }
     }
@@ -31,48 +35,44 @@ function firstRulePassed (permutation, state) {
   return null
 }
 
-function verify (id, _recordState = true) {
+function verify (id, _recordSteps = true) {
   const permutation = fromId(id)
 
-  // Initialize state
-  const state = {}
+  // Initialize knowledge
+  const knowledge = {}
   for (const side of SIDES) {
-    state[side] = {
+    knowledge[side] = {
       d2: UNKNOWN,
       d3: UNKNOWN,
       d4: UNKNOWN,
       d5: UNKNOWN
     }
   }
-  const stateArray = _recordState && [{ state: deepClone(state) }]
+  const steps = _recordSteps && [{ rule: null, knowledge: deepClone(knowledge) }]
 
   while (true) {
-    const nextPassed = firstRulePassed(permutation, state)
-    if (nextPassed) {
-      const { triplet, rule } = nextPassed
-      const { side, truth, d } = rule._then
-      const sideState = state[triplet[side]]
+    const nextRule = firstRulePassed(permutation, knowledge)
+    if (nextRule) {
+      const { triple, side, truth, divisibility } = nextRule
+      const sideKnowledge = knowledge[triple[side]]
 
       // New information found
-      if (sideState[d] === UNKNOWN) {
-        sideState[d] = truth
+      if (sideKnowledge[divisibility] === UNKNOWN) {
+        sideKnowledge[divisibility] = truth
 
-        _recordState && stateArray.push({
-          state: deepClone(state),
-          rule: nextPassed
-        })
+        _recordSteps && steps.push({ rule: nextRule, knowledge: deepClone(knowledge) })
 
       // Contradiction found
       } else {
-        return _recordState
-          ? { contradiction: nextPassed, stateArray }
+        return _recordSteps
+          ? { contradiction: nextRule, steps }
           : true
       }
 
     // No new information could be found
     } else {
-      return _recordState
-        ? { contradiction: null, stateArray }
+      return _recordSteps
+        ? { contradiction: null, steps }
         : false
     }
   }

@@ -7,7 +7,7 @@ const SIDES = [
   'f',
   'g'
 ]
-const TRIPLETS = [
+const TRIPLES = [
   'abd',
   'ace',
   'bcf',
@@ -29,61 +29,27 @@ const TYPES = [
   'x2 x3 x5',
   'x3 x4 x5'
 ]
-const SYMMETRIES = [
-  [ 0, 1, 2, 3, 4, 5 ],
-  [ 2, 0, 1, 4, 5, 3 ],
-  [ 1, 2, 0, 5, 3, 4 ],
-  [ 1, 0, 2, 3, 5, 4 ],
-  [ 2, 1, 0, 5, 4, 3 ],
-  [ 0, 2, 1, 4, 3, 5 ]
-]
 
 function toId (permutation) {
   let id = 0
-  for (let triplet = 0, exp = 1; triplet < 6; ++triplet, exp *= TYPES.length) {
-    id += TYPES.indexOf(permutation[TRIPLETS[triplet]]) * exp
+  for (let triple = 0, exp = 1; triple < 6; ++triple, exp *= TYPES.length) {
+    id += TYPES.indexOf(permutation[TRIPLES[triple]]) * exp
   }
   return id
 }
 
 function fromId (id) {
   const permutation = {}
-  for (let triplet = 0; triplet < 6; ++triplet, id = id / TYPES.length | 0) {
-    permutation[TRIPLETS[triplet]] = TYPES[id % TYPES.length]
+  for (let triple = 0; triple < 6; ++triple, id = id / TYPES.length | 0) {
+    permutation[TRIPLES[triple]] = TYPES[id % TYPES.length]
   }
   return permutation
 }
 
-function getEquivalents (id) {
-  const permutationArray = []
-  for (let triplet = 0; triplet < 6; ++triplet, id = id / TYPES.length | 0) {
-    permutationArray[triplet] = id % TYPES.length
-  }
-
-  const equivalents = SYMMETRIES.map(symmetry => {
-    let id = 0
-    for (let triplet = 0, exp = 1; triplet < 6; ++triplet, exp *= TYPES.length) {
-      id += permutationArray[symmetry[triplet]] * exp
-    }
-    return id
-  })
-
-  return equivalents
-    .sort((a, b) => a > b ? 1 : -1)
-    .reduce((acc, curr) => {
-      if (acc.indexOf(curr) === -1) {
-        acc.push(curr)
-      }
-      return acc
-    }, [])
-}
-
 module.exports = {
   SIDES,
-  TRIPLETS,
+  TRIPLES,
   TYPES,
-  SYMMETRIES,
   toId,
-  fromId,
-  getEquivalents
+  fromId
 }
