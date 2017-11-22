@@ -23,10 +23,18 @@ function firstRulePassed (permutation, knowledge) {
         const { side, truth, divisibility } = rule.then
         if (knowledge[triple[side]][divisibility] !== truth) {
           return {
-            triple,
-            side,
-            truth,
-            divisibility
+            if: rule.if.map(condition => ({
+              triple,
+              side: condition.side,
+              truth: condition.truth,
+              divisibility: condition.divisibility
+            })),
+            then: {
+              triple,
+              side,
+              truth,
+              divisibility
+            }
           }
         }
       }
@@ -53,7 +61,7 @@ function verify (id, _recordSteps = true) {
   while (true) {
     const nextRule = firstRulePassed(permutation, knowledge)
     if (nextRule) {
-      const { triple, side, truth, divisibility } = nextRule
+      const { triple, side, truth, divisibility } = nextRule.then
       const sideKnowledge = knowledge[triple[side]]
 
       // New information found
