@@ -1,6 +1,6 @@
 # perfect-cuboid
 
-http://pillowfication.com/github/perfect-cuboid
+http://pf-n.co/github/perfect-cuboid
 
 ### Results
 
