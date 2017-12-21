@@ -1,21 +1,21 @@
 {
   "name": "perfect-cuboid",
   "version": "0.0.7",
-  "description": "Testing for the existence of a perfect cuboid",
+  "description": "Testing for the existence of a perfect cuboid.",
+  "main": "index.js",
+  "homepage": "https://pf-n.co/perfect-cuboid",
   "author": {
     "name": "Markus Tran",
     "email": "thebluepillow@gmail.com",
     "url": "http://pillowfication.com"
   },
-  "homepage": "https://github.com/pillowfication/perfect-cuboid",
   "repository": {
     "type": "git",
-    "url": "git://github.com/pillowfication/perfect-cuboid.git"
+    "url": "https://github.com/pillowfication/perfect-cuboid.git"
   },
   "bugs": {
     "url": "https://github.com/pillowfication/perfect-cuboid/issues"
   },
-  "main": "index.js",
   "scripts": {
     "test": "node_modules/standard/bin/cmd.js"
   },
